@@ -1,9 +1,20 @@
 ﻿using System;
 using System.Text;
 
-namespace lab3
+namespace lab6
 {
-    abstract class Person
+    interface NewData<T>
+    {
+        T Weight { get; }
+        T Height { get; }
+    }
+    interface ThisPerson : NewData<int>
+    {
+        string Name { get; }
+        string Surname { get; }
+
+    }
+    abstract class Person : ThisPerson
     {
         protected byte age;
 
@@ -11,20 +22,34 @@ namespace lab3
 
         public string Name { get; set; }
 
-        public Person() : this("Unknown", 0, "Unknown")
+        protected int ID;
+
+        public int Height { get; set; }
+
+        public int Weight { get; set; }
+
+        public string Surname { get; set; }
+
+        public Person() : this("Unknown", 0, "Unknown", CreateID())
         { }
 
-        public Person(string name) : this(name, 0, "Unknown")
+        public Person(string name) : this(name, 0, "Unknown", CreateID())
         { }
 
-        public Person(string name, byte age) : this(name, age, "Unknown")
+        public Person(string name, byte age) : this(name, age, "Unknown", CreateID())
         { }
 
-        public Person(string name, byte age, string sex)
+        public Person(string name, byte age, string sex, int id)
         {
             Name = name;
             Age = age;
             Sex = sex;
+            ID = id;
+        }
+
+        public Person(string name, byte age, string sex) : this(name, age)
+        {
+            this.sex = sex;
         }
 
         public string Sex
@@ -54,25 +79,25 @@ namespace lab3
             get { return age; }
         }
 
-        public virtual void Show()
+        public virtual string Show()
         {
-            Console.WriteLine($"Name: {Name}\nAge: {age.ToString()}\nSex: {sex}");
+            return ($"Name: {Name}\nAge: {age.ToString()}\nSex: {sex}");
         }
 
-        static Random rnd = new Random();
+        static Random rand = new Random();
 
-        public static void CreateID()
+        public static int CreateID()
         {
-            Console.WriteLine($"Person's unique id - {rnd.Next(1000, 10000).ToString()}");
+            return rand.Next(1000, 10000);
         }
 
-        public abstract void ShowMarks();
+        public abstract string ShowMarks();
     }
 
     class Student : Person
     {
-        protected int[] _marks;
-        protected string vys;
+        protected int[] marks;
+        protected string Vys;
         public int Length { get; private set; }
         public enum Course
         {
@@ -87,37 +112,39 @@ namespace lab3
         {
             get
             {
-                if (vys[0] == 'B') return vys;
-                else return vys + " isn't belorussian";
+                if (Vys[0] == 'B') return Vys;
+                else return Vys + " isn't belorussian";
             }
             set
             {
-                if (value[0] == 'B') vys = value;
-                else vys = 'B' + value;
+                if (value[0] == 'B') Vys = value;
+                else Vys = 'B' + value;
             }
         }
 
+        public Course CURS { get; set; }
+
         public Student(string name, byte age, string sex, int amount, string yniver) : base(name, age, sex)
         {
-            _marks = new int[amount];
+            marks = new int[amount];
             Length = amount;
             VYS = yniver;
         }
 
         public Student(string name, int amount) : this(name, 18, "Unknown", amount, "BSUIR")
         {
-            _marks = new int[amount];
+            marks = new int[amount];
             Length = amount;
         }
 
         public Student(int amount, string yniver) : this("Pasha", 18, "male", amount, yniver)
         {
-            _marks = new int[amount];
+            marks = new int[amount];
             Length = amount;
             VYS = yniver;
         }
 
-        public Student() : this("Pasha", 18, "male", 3, "BSUIR")
+        public Student() : this("Ivan", 18, "male", 3, "BSUIR")
         { }
 
         public int this[int index]
@@ -125,35 +152,40 @@ namespace lab3
             get
             {
                 if (index > 0 && index <= Length)
-                    return _marks[index - 1];
+                    return marks[index - 1];
                 else
-                    return _marks[0];
+                    return marks[0];
             }
             set
             {
                 if (index > 0 && index <= Length && value <= 10 && value >= 0)
-                    _marks[index - 1] = value;
+                    marks[index - 1] = value;
                 else
-                    Console.WriteLine("incorrect input");
+                    throw new ArgumentException();
+                //Console.WriteLine("incorrect input");
             }
         }
 
-        public new virtual void Show()
+        public new virtual string Show()
         {
-            Console.WriteLine($"Name: {Name}\nAge: {age.ToString()}\nSex: {sex}\nVYS: {VYS}");
+            return ($"Name: {Name}\nAge: {age.ToString()}\nSex: {sex}\nVYS: {VYS}");
         }
 
-        public override void ShowMarks()
+        public override string ShowMarks()
         {
-            int i = 1;
-            foreach (int mark in _marks)
-            {
-                Console.WriteLine($"{i}: {mark}");
-                i++;
-            }
+            string ocenki = "";
+            foreach (int mark in marks)
+                ocenki += mark.ToString() + " ";
+            return ocenki;
         }
     }
-    sealed class Cadet : Student
+    public interface IExample
+    {
+        public int Auditoria { get; set; }
+        public string Validity { get; set; }
+
+    }
+    sealed class Cadet : Student, IExample
     {
         public int Auditoria { get; set; }
         private string validity;
@@ -171,10 +203,13 @@ namespace lab3
                 else
                 {
                     validity = "Unknown " + value;
-                    Console.WriteLine("Incorrect input");
+                    throw new ArgumentException();
                 }
+
             }
         }
+
+        // string Example.validity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public Cadet(int auditoria, string validi) : this("Danik", 17, "male", 3, "MINDS", auditoria, validi)
         {
@@ -223,7 +258,7 @@ namespace lab3
 
             for (int i = 0; i < amount; i++)
             {
-                Console.WriteLine($"Enter info about {(i + 1).ToString()} Cadets:(name, age, sex, amount of marks, VYS, auditoriaight, validity)");
+                Console.WriteLine($"Enter info about {(i + 1).ToString()} Cadets:(name, age, sex, amount of marks, VYS, auditoria, validity)");
                 group[i] = new Cadet(Console.ReadLine(), Input(), Console.ReadLine(), Input(), Console.ReadLine(), Input(), Console.ReadLine());
                 Console.Clear();
             }
@@ -264,8 +299,6 @@ namespace lab3
         }
 
 
-
-
-
     }
 }
+
