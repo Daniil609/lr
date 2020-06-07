@@ -219,13 +219,10 @@ namespace dop
 
 
     }
-    public interface IComparer<T>
+    
+    class AgeComparer : IComparerable<Veihicle>
     {
-        int Compare(T up1, T up2);
-    }
-    class AgeComparer : IComparer<Veihicle>
-    {
-        public int Compare(Veihicle ps1, Veihicle ps2)
+        public int Compareble(Veihicle ps1, Veihicle ps2)
         {
             if (ps1.Year < ps2.Year)
             {
@@ -299,6 +296,7 @@ namespace dop
             Example._Info += () => Console.WriteLine(messagePS);
 
             Example.Marka = "KIA";
+            Example.Len = Car.Lenght.Cabrio;
             try
             {
                 int x;
@@ -320,8 +318,8 @@ namespace dop
             {
                 Console.WriteLine("\nNew Car added to the data base.");
             };
-            AgeComparer comparator = new AgeComparer();
-            comparator.Compare(Example, Nisan);
+            AgeComparer compa = new AgeComparer();
+            compa.Compareble(Example, Nisan);
 
             {
                 Example._Info -= DisplayMessageAdvanced;
