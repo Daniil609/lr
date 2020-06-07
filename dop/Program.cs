@@ -25,7 +25,10 @@ namespace dop
             }
         }
     }
-    
+    public interface IComparerable<T>
+	{
+        int Comparerable(T namb1, T namb2);
+    }
     interface ThisViechicl 
     {
         string Marka { get; }
@@ -118,7 +121,15 @@ namespace dop
         protected string Country;
         protected int[] NumberOfSeates;
         public int Length { get; private set; }
-
+        public enum Lenght
+        {
+            Long = 1,
+            Extralong,
+            Sort,
+            Cabrio
+            
+        }
+        public Lenght Len { get; set; }
         public event Information Info;
         public event Information _Info
         {
